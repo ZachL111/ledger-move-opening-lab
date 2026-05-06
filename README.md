@@ -1,68 +1,40 @@
 # ledger-move-opening-lab
 
-`ledger-move-opening-lab` is a focused Elixir codebase around build an Elixir toolkit that studies opening behavior through deny and allow fixtures, with explainable decision traces and synthetic fixtures only. It is meant to be easy to inspect, run, and extend without a hosted service.
-
-## Ledger Move Opening Lab Walkthrough
-
-I would read the project from the outside in: command, fixture, model, then roadmap. That keeps the chess and game engines idea grounded in files that can be checked locally.
+`ledger-move-opening-lab` is a Elixir project in chess and game engines. Its focus is to build an Elixir toolkit that studies opening behavior through deny and allow fixtures, with explainable decision traces and synthetic fixtures only.
 
 ## Reason For The Project
 
-This project keeps the domain idea close to the tests. That makes it useful as a reference implementation, a small experiment, or a starting point for a more specialized tool.
+The point is to make a small domain rule concrete enough that a reader can change it and immediately see what broke.
 
-## Where Things Live
+## Ledger Move Opening Lab Review Notes
 
-- `lib`: library code
-- `test`: language test directory
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+`stress` and `baseline` are the cases worth reading first. They show the optimistic and cautious ends of the fixture.
 
-## Capabilities
+## What It Does
 
-- Includes extended examples for turn flow, including `recovery` and `degraded`.
-- Documents search limits tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+- `fixtures/domain_review.csv` adds cases for position pressure and move ordering.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/ledger-move-opening-walkthrough.md` walks through the case spread.
+- The Elixir code includes a review path for `move ordering` and `position pressure`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
 ## How It Is Put Together
 
-The project is organized around a compact model rather than a large framework. Inputs are scored, classified, and checked against golden fixtures. The constants live in code and are mirrored in metadata so documentation drift is easy to catch. The Elixir project uses Mix and ExUnit with clear data maps for each scenario.
+The implementation keeps the scoring rule plain: reward signal and confidence, preserve slack, penalize drag, then classify the result into a review lane.
 
-## Getting It Running
+The Elixir addition stays small enough to inspect in one sitting.
 
-The only required setup is the local Elixir toolchain. After cloning, stay in the repo root so fixture paths resolve correctly.
-
-## Data Notes
-
-`boundary` is the first example I would inspect because it lands on the `review` path with a score of 136. The broader file also keeps `degraded` at 17 and `recovery` at 237, which gives the model a useful low-to-high spread.
-
-## Command Examples
+## Run It
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Check It
 
-## Check The Work
+The same command runs the local verification path. The highest-scoring domain case is `stress` at 224, which lands in `ship`. The most cautious case is `baseline` at 105, which lands in `watch`.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
+## Boundaries
 
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Possible Extensions
-
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add a short report command that prints the score breakdown for a single scenario.
-- Add one more chess and game engines fixture that focuses on a malformed or borderline input.
-
-## Tradeoffs
-
-The scoring model is simple by design. More domain-specific behavior should be added through explicit adapters or extra fixture classes rather than hidden constants.
+The fixture set is small enough to audit by hand. The next useful expansion is malformed input coverage, not extra surface area.
